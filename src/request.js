@@ -42,7 +42,6 @@ const fetchData = (url, options = {}) => {
                 })
                 .then(res => {
                     if (res.status === 0) {
-                        ElMessage.success(res.message)
                         resolve(res);
                     } else {
                         ElMessage.error(res.message)
@@ -60,7 +59,6 @@ const fetchData = (url, options = {}) => {
                 .post(url, params)
                 .then(res => {
                     if (res.status === 0) {
-                        ElMessage.success(res.message)
                         resolve(res);
                     } else {
                         ElMessage.error(res.message)

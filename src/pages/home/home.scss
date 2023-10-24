@@ -21,18 +21,15 @@
     height: calc(100vh - 60px);
   }
   :deep(.el-main) {
-    border: 1px solid blue;
   }
-  :deep(.el-menu) {
-    height: 100%;
-    .el-menu-item {
-      border-bottom: 1px solid #f40;
-    }
-  }
+  
   :deep(.el-main) {
     .el-input{
       width: 550px;
     }
+	.el-page-header{
+		margin-bottom: 20px;
+	}
   }
   :deep(.avatar-uploader .avatar) {
     height: 150px;

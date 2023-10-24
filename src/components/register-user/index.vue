@@ -6,6 +6,9 @@
         <el-form-item label="密码" prop="password" required>
             <el-input v-model="form.password" placeholder="长度在6~16位之间且必须同时包含英文、数字" type="password" show-password />
         </el-form-item>
+		<el-form-item label="新密码" prop="new_password" required v-if="pageMode=='edit'">
+		    <el-input v-model="form.new_password" placeholder="长度在6~16位之间且必须同时包含英文、数字" type="password" show-password />
+		</el-form-item>
         <el-form-item label="昵称" prop="nickname">
             <el-input v-model="form.nickname" placeholder="只能由英文字母、汉字、数字组合 1~30位 不填将生成随机昵称" />
         </el-form-item>
@@ -15,7 +18,7 @@
         <el-form-item label="地址" prop="address">
             <el-input v-model="form.address" placeholder="用户地址" />
         </el-form-item>
-        <el-form-item label="头像" required prop="avatarUrl">
+        <el-form-item label="头像" prop="avatarUrl" v-if="pageMode=='edit'">
             <el-upload class="avatar-uploader" action="http://127.0.0.1:8888/verify/uploadAvatar" method="POST"
                 :headers="{ Authorization: token }" :show-file-list="false" :drag="true" :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload">
@@ -37,13 +40,17 @@ import { ElMessage } from 'element-plus'
 import fetchData from '../../request.js'
 const ruleFormRef = ref(null); // 创建表单的引用
 let token = ref('')
+const props = defineProps({
+  pageMode: String
+})
 let form = reactive({
     username: '',
     password: '',
     nickname: '',
     email: '',
     address: '',
-    avatarUrl: ''
+    avatarUrl: '',
+	new_password:''
 })
 
 onMounted(() => {
@@ -65,18 +72,18 @@ const rules = reactive ({
 const submitForm = (refs) => {
     // 注册前先检查表单
     if (!form.nickname) {
-        form.nickname = '食客_'+Math.round(Math.random() * 100000000000)
-    }
-    if (!form.avatarUrl) {
-        ElMessage.error('头像必须上传')
-        return false
+        form.nickname = '食客'+Math.round(Math.random() * 100000000000)
     }
     fetchData('/api/register', {
         method: 'POST',
         params: {
             ...form
         }
-    })
+    }).then(res=>{
+		if(res.status===0){
+			ElMessage.success(res.message)
+		}
+	})
 }
 
 const resetForm = () => {
