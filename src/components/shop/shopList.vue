@@ -8,43 +8,66 @@
 				placeholder="输入搜索内容 昵称/手机号/账号/邮箱"
 				:prefix-icon="Search"
 				clearable
-				@input="searchUser"
+				@input="searchShop"
 			></el-input>
 		</el-row>
-		<el-table :data="userlist" border empty-text="暂无数据" ref="tableRef" stripe>
+		<el-table :data="userlist"  empty-text="暂无数据" ref="tableRef" stripe>
 			<el-table-column fixed label="操作" width="350">
 				<template #default="scope">
-					<div style="display: flex; align-items: center">
+					<div style="display: flex;justify-content: center; align-items: center">
 						<el-button :disabled="scope.row.status>0||userinfo.power<=scope.row.power" type="primary" round @click="editUser(scope.row)">编辑</el-button>
-						<el-button :disabled="scope.row.status>0||userinfo.power<=scope.row.power" type="info" round @click="banUser(scope.row.id)">封号</el-button>
-						<el-button :disabled="scope.row.status===2||userinfo.power<=scope.row.power" type="danger" round @click="deleteUser(scope.row.id)">注销</el-button>
-						<el-button :disabled="scope.row.status===0||userinfo.power<=scope.row.power" type="success" round @click="restoreUser(scope.row.id)">恢复</el-button>
+						<el-button :disabled="scope.row.status>0||userinfo.power<=scope.row.power" type="info" round @click="banUser(scope.row.shop_id)">封店</el-button>
+						<el-button :disabled="scope.row.status===2||userinfo.power<=scope.row.power" type="danger" round @click="deleteUser(scope.row.shop_id)">注销</el-button>
+						<el-button :disabled="scope.row.status===0||userinfo.power<=scope.row.power" type="success" round @click="restoreUser(scope.row.shop_id)">恢复</el-button>
 					</div>
 				</template>
 			</el-table-column>
-			<el-table-column prop="id" label="ID" width="100" />
-			<el-table-column prop="username" label="账号" width="150" />
-			<el-table-column prop="nickname" label="昵称" width="200" />
-			<el-table-column prop="avatar" label="头像" width="90">
+			<el-table-column prop="shop_id" label="ID" width="100" />
+			<el-table-column prop="shop_admin" label="管理员账号" width="150" />
+			<el-table-column prop="shop_name" label="昵称" width="200" />
+			<el-table-column prop="shop_license" label="营业执照" width="100">
 				<template #default="scope">
-			        <div style="display: flex; align-items: center">
-						<el-avatar shape="square" size="large" :icon="UserFilled" :src="scope.row.avatar" />
+			        <div style="display: flex;justify-content: center; align-items: center">
+						<el-image v-if="scope.row.shop_license" :preview-teleported="true" :src="scope.row.shop_license" fit="scale-down" />
 			        </div>
 			    </template>
 			</el-table-column>
-			<el-table-column prop="emailStr" label="邮箱" width="250" />
-			<el-table-column prop="phoneStr" label="手机号" width="200" />
-			<el-table-column prop="addressStr" label="地址" width="500" />
-			<el-table-column prop="vipStr" label="会员等级" width="100" />
-			<el-table-column prop="powerStr" label="账户级别" width="100" />
-			<el-table-column prop="balance" label="余额" width="100" />
-			<el-table-column prop="cardStr" label="银行卡号" width="200" />
-			<el-table-column prop="status" label="状态" width="100">
+			<el-table-column prop="shop_banner" label="店铺海报" width="100">
 				<template #default="scope">
-				    <div style="display: flex; align-items: center">
-						<el-tag class="ml-2" type="success" v-if="scope.row.status===0">正常</el-tag>
-						<el-tag class="ml-2" type="info" v-if="scope.row.status===1">封号</el-tag>
-						<el-tag class="ml-2" type="danger" v-if="scope.row.status===2">已注销</el-tag>
+					<span v-if="!scope.row.shop_banner">未上传</span>
+					<div v-if="scope.row.shop_banner" style="display: flex;justify-content: center; align-items: center">
+						<el-image
+						  style="width: 100px; height: 100px"
+						  :src="scope.row.shop_banner[0]"
+						  :zoom-rate="1.2"
+						  :max-scale="3"
+						  :min-scale="0.2"
+						  :preview-teleported="true"
+						  :infinite="false"
+						  :preview-src-list="scope.row.shop_banner|| []"
+						  :initial-index="0"
+						  fit="scale-down"
+						/>
+					</div>
+				</template>
+			</el-table-column>
+			<el-table-column prop="shop_host" label="负责人姓名" width="250" />
+			<el-table-column prop="shop_phone" label="店铺联系电话" width="200" />
+			<el-table-column prop="shop_address" label="店铺地址" width="500" />
+			<el-table-column prop="shop_card" label="店铺提现卡号" width="200" >
+			<template #default="scope">
+			    <div style="display: flex; justify-content: center;align-items: center;">
+					<span v-if="scope.row.shop_card">{{scope.row.shop_card}}</span><span v-if="!scope.row.shop_card">未绑定</span>
+			    </div>
+			</template>
+			</el-table-column>
+			<el-table-column prop="shop_status" label="状态" width="100">
+				<template #default="scope">
+				    <div style="display: flex; justify-content: center;align-items: center">
+						<el-tag class="ml-2" type="success" v-if="scope.row.shop_status===0">正常营业</el-tag>
+						<el-tag class="ml-2" type="info" v-if="scope.row.shop_status===1">暂停营业</el-tag>
+						<el-tag class="ml-2" type="danger" v-if="scope.row.shop_status===2">封店</el-tag>
+						<el-tag class="ml-2" type="danger" v-if="scope.row.shop_status===3">注销</el-tag>
 				    </div>
 				</template>
 			</el-table-column>
@@ -79,7 +102,7 @@ watch(page_number, (num) => {
   }
 });
 // 搜索用户
-const searchUser = () =>{
+const searchShop = () =>{
 	if(canSearch.value){
 		canSearch.value = false
 		setTimeout(()=>{
@@ -89,7 +112,7 @@ const searchUser = () =>{
 			getUserList()
 			return
 		}
-		fetchData('/verify/queryUser',{
+		fetchData('/verify/queryShop',{
 			method:'GET',
 			params:{
 				searchTerm:SearchWord.value
@@ -101,17 +124,13 @@ const searchUser = () =>{
 	}
 }
 // 格式化user数据
-const formatUser = (user)=>{
-	user.forEach((e)=>{
-		!e.phone?e.phoneStr = '还未添加手机号':e.phoneStr = e.phone
-		!e.email?e.emailStr = '还未添加邮箱号':e.emailStr = e.email 
-		!e.address?e.addressStr = '还未添加地址':e.addressStr = e.address
-		!e.card?e.cardStr = '还未添加银行卡':e.cardStr = e.card
-		e.avatarUrl = e.avatar
-		e.vip===0?e.vipStr='普通会员':e.vip===1?e.vipStr='高级会员':e.vipStr='数据异常'
-		e.power===0?e.powerStr='普通用户':e.power===1?e.powerStr='商户':e.power===2?e.powerStr='客服':e.power===3?e.powerStr='顶级管理员':e.powerStr='数据异常'
+const formatUser = (shop)=>{
+	shop.forEach((e)=>{
+		if(e.shop_banner){
+			e.shop_banner = e.shop_banner.split(',')||[]
+		}
 	})
-	return user
+	return shop
 }
 // 页码改变
 const currentChange = (e)=>{
@@ -119,8 +138,7 @@ const currentChange = (e)=>{
 }
 // 获取用户列表
 const getUserList = () => {
-	fetchData('/verify/getAllUser',{
-		method:'GET',
+	fetchData('/verify/getAllShop',{
 		params:{
 			page_number:page_number.value,
 			page_count:page_count.value
